@@ -1,0 +1,297 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Bluesky AT Protocol API",
+    "version": "1.0.0",
+    "description": "Bluesky API based on AT Protocol lexicons. Covers posting, media upload, and authentication."
+  },
+  "servers": [
+    { "url": "https://bsky.social/xrpc" }
+  ],
+  "paths": {
+    "/com.atproto.server.createSession": {
+      "post": {
+        "operationId": "createSession",
+        "summary": "Create an authentication session",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["identifier", "password"],
+                "properties": {
+                  "identifier": { "type": "string", "description": "Handle or other identifier supported by the server" },
+                  "password": { "type": "string" },
+                  "authFactorToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["accessJwt", "refreshJwt", "handle", "did"],
+                  "properties": {
+                    "accessJwt": { "type": "string" },
+                    "refreshJwt": { "type": "string" },
+                    "handle": { "type": "string" },
+                    "did": { "type": "string" },
+                    "email": { "type": "string" },
+                    "emailConfirmed": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/com.atproto.repo.createRecord": {
+      "post": {
+        "operationId": "createRecord",
+        "summary": "Create a single new repository record (post, like, etc)",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["repo", "collection", "record"],
+                "properties": {
+                  "repo": { "type": "string", "description": "The handle or DID of the repo (current account)" },
+                  "collection": { "type": "string", "description": "The NSID of the record collection (e.g., app.bsky.feed.post)" },
+                  "rkey": { "type": "string", "maxLength": 512, "description": "The Record Key" },
+                  "validate": { "type": "boolean", "description": "Skip or require Lexicon schema validation" },
+                  "record": { "type": "object", "description": "The record itself. Must contain a $type field." },
+                  "swapCommit": { "type": "string", "description": "Compare and swap with previous commit by CID" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Record created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["uri", "cid"],
+                  "properties": {
+                    "uri": { "type": "string", "description": "AT URI of the created record" },
+                    "cid": { "type": "string", "description": "Content hash identifier" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/com.atproto.repo.uploadBlob": {
+      "post": {
+        "operationId": "uploadBlob",
+        "summary": "Upload a new blob (image/video) to be referenced from a record",
+        "description": "The blob will be deleted if not referenced within a time window. Blob restrictions (mimetype, size) are enforced when the reference is created.",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "*/*": {
+              "schema": { "type": "string", "format": "binary" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blob uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["blob"],
+                  "properties": {
+                    "blob": { "$ref": "#/components/schemas/Blob" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Blob": {
+        "type": "object",
+        "required": ["$type", "ref", "mimeType", "size"],
+        "properties": {
+          "$type": { "type": "string", "const": "blob" },
+          "ref": { "type": "object", "properties": { "$link": { "type": "string" } } },
+          "mimeType": { "type": "string" },
+          "size": { "type": "integer" }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": ["$type", "text", "createdAt"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.feed.post" },
+          "text": { "type": "string", "maxLength": 3000, "description": "Post content (max 300 graphemes)" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "langs": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+          "facets": { "type": "array", "items": { "$ref": "#/components/schemas/Facet" } },
+          "reply": { "$ref": "#/components/schemas/ReplyRef" },
+          "embed": { "$ref": "#/components/schemas/Embed" },
+          "tags": { "type": "array", "items": { "type": "string" }, "maxItems": 8 }
+        }
+      },
+      "Facet": {
+        "type": "object",
+        "required": ["index", "features"],
+        "properties": {
+          "index": {
+            "type": "object",
+            "required": ["byteStart", "byteEnd"],
+            "properties": {
+              "byteStart": { "type": "integer", "minimum": 0 },
+              "byteEnd": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/MentionFacet" },
+                { "$ref": "#/components/schemas/LinkFacet" },
+                { "$ref": "#/components/schemas/TagFacet" }
+              ]
+            }
+          }
+        }
+      },
+      "MentionFacet": {
+        "type": "object",
+        "required": ["$type", "did"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.richtext.facet#mention" },
+          "did": { "type": "string" }
+        }
+      },
+      "LinkFacet": {
+        "type": "object",
+        "required": ["$type", "uri"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.richtext.facet#link" },
+          "uri": { "type": "string", "format": "uri" }
+        }
+      },
+      "TagFacet": {
+        "type": "object",
+        "required": ["$type", "tag"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.richtext.facet#tag" },
+          "tag": { "type": "string", "maxLength": 640 }
+        }
+      },
+      "ReplyRef": {
+        "type": "object",
+        "required": ["root", "parent"],
+        "properties": {
+          "root": { "$ref": "#/components/schemas/StrongRef" },
+          "parent": { "$ref": "#/components/schemas/StrongRef" }
+        }
+      },
+      "StrongRef": {
+        "type": "object",
+        "required": ["uri", "cid"],
+        "properties": {
+          "uri": { "type": "string" },
+          "cid": { "type": "string" }
+        }
+      },
+      "Embed": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/ImagesEmbed" },
+          { "$ref": "#/components/schemas/VideoEmbed" },
+          { "$ref": "#/components/schemas/ExternalEmbed" }
+        ]
+      },
+      "ImagesEmbed": {
+        "type": "object",
+        "required": ["$type", "images"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.embed.images" },
+          "images": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "required": ["image", "alt"],
+              "properties": {
+                "image": { "$ref": "#/components/schemas/Blob" },
+                "alt": { "type": "string" },
+                "aspectRatio": {
+                  "type": "object",
+                  "properties": {
+                    "width": { "type": "integer" },
+                    "height": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "VideoEmbed": {
+        "type": "object",
+        "required": ["$type", "video"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.embed.video" },
+          "video": { "$ref": "#/components/schemas/Blob" },
+          "alt": { "type": "string", "maxLength": 10000 },
+          "aspectRatio": {
+            "type": "object",
+            "properties": {
+              "width": { "type": "integer" },
+              "height": { "type": "integer" }
+            }
+          }
+        },
+        "description": "Video embed. Max 100MB, MP4 only."
+      },
+      "ExternalEmbed": {
+        "type": "object",
+        "required": ["$type", "external"],
+        "properties": {
+          "$type": { "type": "string", "const": "app.bsky.embed.external" },
+          "external": {
+            "type": "object",
+            "required": ["uri", "title", "description"],
+            "properties": {
+              "uri": { "type": "string", "format": "uri" },
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "thumb": { "$ref": "#/components/schemas/Blob" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

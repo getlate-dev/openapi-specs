@@ -1,0 +1,172 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Threads API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://www.threads.net" }
+  ],
+  "paths": {
+    "/api/graphql/getUserProfile": {
+      "post": {
+        "operationId": "getUserProfile",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A ThreadsUser object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetUserProfileResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/graphql/getUserProfileThreads": {
+      "post": {
+        "operationId": "getUserProfileThreads",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Thread objects",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetUserProfileThreadsResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/graphql/getUserProfileReplies": {
+      "post": {
+        "operationId": "getUserProfileReplies",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Thread objects",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetUserProfileRepliesResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GetUserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "userData": {
+                "type": "object",
+                "properties": {
+                  "user": { "$ref": "#/components/schemas/ThreadsUser" }
+                }
+              }
+            }
+          },
+          "extensions": { "$ref": "#/components/schemas/Extensions" }
+        }
+      },
+      "GetUserProfileThreadsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "mediaData": {
+                "type": "object",
+                "properties": {
+                  "threads": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Thread" }
+                  }
+                }
+              }
+            }
+          },
+          "extensions": { "$ref": "#/components/schemas/Extensions" }
+        }
+      },
+      "GetUserProfileRepliesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "mediaData": {
+                "type": "object",
+                "properties": {
+                  "threads": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Thread" }
+                  }
+                }
+              }
+            }
+          },
+          "extensions": { "$ref": "#/components/schemas/Extensions" }
+        }
+      },
+      "Extensions": {
+        "type": "object",
+        "description": "Extensions object"
+      },
+      "ThreadsUser": {
+        "type": "object",
+        "description": "ThreadsUser object"
+      },
+      "Thread": {
+        "type": "object",
+        "description": "Thread object"
+      }
+    }
+  }
+}

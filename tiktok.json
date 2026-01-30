@@ -1,0 +1,328 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TikTok Content Posting API",
+    "version": "2.0",
+    "description": "TikTok Content Posting API for publishing videos and photos directly to TikTok creator accounts."
+  },
+  "servers": [
+    { "url": "https://open.tiktokapis.com" }
+  ],
+  "paths": {
+    "/v2/post/publish/creator_info/query/": {
+      "post": {
+        "operationId": "queryCreatorInfo",
+        "summary": "Query creator info before posting",
+        "description": "Returns creator metadata including avatar URL, username, privacy options, and content restrictions.",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Creator info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatorInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/post/publish/video/init/": {
+      "post": {
+        "operationId": "initVideoPost",
+        "summary": "Initialize video upload",
+        "description": "Initialize the upload session. Returns publish_id and upload_url for FILE_UPLOAD source. Rate limit: 6 requests per minute per user.",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoInitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload initialized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid parameters" },
+          "401": { "description": "Invalid or expired access token" },
+          "403": { "description": "Rate limit, spam risk, or unverified domain" },
+          "429": { "description": "Rate limit exceeded" }
+        }
+      }
+    },
+    "/v2/post/publish/content/init/": {
+      "post": {
+        "operationId": "initPhotoPost",
+        "summary": "Initialize photo post",
+        "description": "Initialize a photo post. Photos must be from verified domain URLs.",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoInitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Photo post initialized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/post/publish/status/fetch/": {
+      "post": {
+        "operationId": "fetchPostStatus",
+        "summary": "Get post status",
+        "description": "Monitor async video/photo processing status.",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["publish_id"],
+                "properties": {
+                  "publish_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/post/publish/cancel/": {
+      "post": {
+        "operationId": "cancelUpload",
+        "summary": "Cancel upload task",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["publish_id"],
+                "properties": {
+                  "publish_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "User access token with video.publish scope"
+      }
+    },
+    "schemas": {
+      "VideoInitRequest": {
+        "type": "object",
+        "required": ["post_info", "source_info"],
+        "properties": {
+          "post_info": {
+            "type": "object",
+            "required": ["privacy_level"],
+            "properties": {
+              "title": { "type": "string", "maxLength": 2200, "description": "Video caption" },
+              "privacy_level": {
+                "type": "string",
+                "enum": ["PUBLIC_TO_EVERYONE", "MUTUAL_FOLLOW_FRIENDS", "FOLLOWER_OF_CREATOR", "SELF_ONLY"]
+              },
+              "disable_duet": { "type": "boolean" },
+              "disable_stitch": { "type": "boolean" },
+              "disable_comment": { "type": "boolean" },
+              "video_cover_timestamp_ms": { "type": "integer", "description": "Thumbnail timestamp in ms" },
+              "brand_content_toggle": { "type": "boolean", "description": "Paid partnership" },
+              "brand_organic_toggle": { "type": "boolean", "description": "Creator's own business" },
+              "is_aigc": { "type": "boolean", "description": "AI-generated content" }
+            }
+          },
+          "source_info": {
+            "type": "object",
+            "required": ["source"],
+            "properties": {
+              "source": { "type": "string", "enum": ["FILE_UPLOAD", "PULL_FROM_URL"] },
+              "video_url": { "type": "string", "description": "Required for PULL_FROM_URL" },
+              "video_size": { "type": "integer", "description": "Required for FILE_UPLOAD" },
+              "chunk_size": { "type": "integer", "minimum": 5242880, "maximum": 67108864 },
+              "total_chunk_count": { "type": "integer", "minimum": 1, "maximum": 1000 }
+            }
+          }
+        }
+      },
+      "PhotoInitRequest": {
+        "type": "object",
+        "required": ["post_info", "source_info", "post_mode", "media_type"],
+        "properties": {
+          "post_mode": { "type": "string", "const": "DIRECT_POST" },
+          "media_type": { "type": "string", "const": "PHOTO" },
+          "post_info": {
+            "type": "object",
+            "required": ["privacy_level"],
+            "properties": {
+              "title": { "type": "string", "maxLength": 2200 },
+              "privacy_level": { "type": "string", "enum": ["PUBLIC_TO_EVERYONE", "MUTUAL_FOLLOW_FRIENDS", "FOLLOWER_OF_CREATOR", "SELF_ONLY"] },
+              "disable_comment": { "type": "boolean" }
+            }
+          },
+          "source_info": {
+            "type": "object",
+            "required": ["source", "photo_images"],
+            "properties": {
+              "source": { "type": "string", "const": "PULL_FROM_URL" },
+              "photo_images": {
+                "type": "array",
+                "items": { "type": "string", "format": "uri" },
+                "description": "URLs from verified domains"
+              },
+              "photo_cover_index": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "InitResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "publish_id": { "type": "string" },
+              "upload_url": { "type": "string", "description": "Valid for 1 hour" }
+            }
+          },
+          "error": { "$ref": "#/components/schemas/ErrorResponse" }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": { "type": "string", "enum": ["PROCESSING_UPLOAD", "PROCESSING_DOWNLOAD", "SEND_TO_USER_INBOX", "PUBLISH_COMPLETE", "FAILED"] },
+              "fail_reason": { "type": "string" },
+              "publicaly_available_post_id": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "error": { "$ref": "#/components/schemas/ErrorResponse" }
+        }
+      },
+      "CreatorInfoResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "creator_avatar_url": { "type": "string" },
+              "creator_username": { "type": "string" },
+              "creator_nickname": { "type": "string" },
+              "privacy_level_options": { "type": "array", "items": { "type": "string" } },
+              "comment_disabled": { "type": "boolean" },
+              "duet_disabled": { "type": "boolean" },
+              "stitch_disabled": { "type": "boolean" },
+              "max_video_post_duration_sec": { "type": "integer" }
+            }
+          },
+          "error": { "$ref": "#/components/schemas/ErrorResponse" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "log_id": { "type": "string" }
+        }
+      }
+    }
+  },
+  "x-ratelimits": {
+    "per_user": "6 requests per minute",
+    "upload_url_validity": "1 hour"
+  },
+  "x-video-requirements": {
+    "formats": ["MP4", "WebM", "MOV"],
+    "codecs": ["H.264", "H.265", "VP8", "VP9"],
+    "frame_rate": "23-60 FPS",
+    "resolution": { "min": "360x360", "max": "4096x4096" },
+    "duration_max": "10 minutes",
+    "chunk_size": { "min": "5MB", "max": "64MB", "final_max": "128MB" }
+  },
+  "x-error-codes": {
+    "invalid_param": "Parameter validation failure",
+    "spam_risk_too_many_posts": "Daily post limit reached",
+    "spam_risk_user_banned_from_posting": "User posting ban",
+    "reached_active_user_cap": "Client daily quota exceeded",
+    "unaudited_client_can_only_post_to_private_accounts": "Unaudited restriction",
+    "url_ownership_unverified": "Domain verification required",
+    "privacy_level_option_mismatch": "Privacy level invalid",
+    "access_token_invalid": "Token expired/invalid",
+    "scope_not_authorized": "Missing video.publish scope",
+    "rate_limit_exceeded": "Rate limit violation"
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Facebook API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://graph.facebook.com" },
+    { "url": "https://rupload.facebook.com" }
+  ],
+  "tags": [
+    {
+      "name": "Tokens",
+      "description": "An access token is a string that identifies a user, app or Page and is used by an app to make Graph API calls. This section will cover the basics of tokens used for the Pages API."
+    },
+    {
+      "name": "Reels Publishing",
+      "description": "This section allows developers to upload and publish a Reel into a Facebook page from a local file or CDN. Supported video formats: 3g2, 3gp, 3gpp, asf, avi, dat, divx, dv, f4v, flv, m2ts, m4v, mkv, mod, mov, mp4, mpe, mpeg, mpeg4, mpg, mts, nsv, ogm, ogv, qt, tod, ts, vob, wmv."
+    }
+  ],
+  "paths": {
+    "/{api_version}/me/accounts": {
+      "get": {
+        "tags": ["Tokens"],
+        "operationId": "getPageAccessTokens",
+        "summary": "Get Access Tokens of Pages You Manage",
+        "description": "This request uses a User Access Token to get a list of all the pages managed by a User.",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "Postman/FacebookCollection"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "name,access_token,tasks"
+          },
+          {
+            "name": "access_token",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "api_version",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "access_token": { "type": "string" },
+                          "id": { "type": "string" },
+                          "tasks": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          }
+                        }
+                      }
+                    },
+                    "paging": { "$ref": "#/components/schemas/Paging" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{api_version}/{page_id}": {
+      "get": {
+        "tags": ["Tokens"],
+        "operationId": "getSpecificPageAccessToken",
+        "summary": "Get Specific Page Access Token",
+        "description": "If you already have the page_id available, you can query directly this endpoint to get the specific Page Access Token.",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "Postman/FacebookCollection"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "name,access_token"
+          },
+          {
+            "name": "access_token",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "api_version",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          },
+          {
+            "name": "page_id",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "access_token": { "type": "string" },
+                    "id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{api_version}/me/video_reels": {
+      "post": {
+        "tags": ["Reels Publishing"],
+        "operationId": "publishReel",
+        "summary": "Publish Reel",
+        "description": "Ends the upload phase to start assembling and encoding the video. You can also customize the reel with the optional parameters.",
+        "requestBody": { "content": {} },
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "Postman/FacebookCollection"
+          },
+          {
+            "name": "access_token",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "video_id",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "upload_phase",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Signal to finish the upload phase",
+            "example": "finish"
+          },
+          {
+            "name": "video_state",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Possible values: DRAFT, SCHEDULED, PUBLISHED",
+            "example": "PUBLISHED"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Optional"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Optional"
+          },
+          {
+            "name": "api_version",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/video-upload/{api_version}/{video_id}": {
+      "post": {
+        "tags": ["Reels Publishing"],
+        "operationId": "uploadHostedReel",
+        "summary": "Upload Hosted Reel",
+        "description": "This method is used when the video source is hosted on a CDN. The video link must be included in the file_url header.",
+        "requestBody": { "content": {} },
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "OAuth {{page_access_token}}"
+          },
+          {
+            "name": "file_url",
+            "in": "header",
+            "schema": { "type": "string" },
+            "description": "Replace with your own web hosted video URL"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "Postman/FacebookCollection"
+          },
+          {
+            "name": "api_version",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          },
+          {
+            "name": "video_id",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{api_version}/{video_id}": {
+      "get": {
+        "tags": ["Reels Publishing"],
+        "operationId": "getUploadSessionStatus",
+        "summary": "Get upload session status",
+        "description": "Retrieves the status of the Reels publishing operation composed of three steps: uploading, processing and publishing.",
+        "parameters": [
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "schema": { "type": "string" },
+            "example": "Postman/FacebookCollection"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "status"
+          },
+          {
+            "name": "access_token",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "api_version",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          },
+          {
+            "name": "video_id",
+            "in": "path",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "object",
+                      "properties": {
+                        "video_status": { "type": "string" },
+                        "processing_progress": { "type": "integer" },
+                        "uploading_phase": {
+                          "type": "object",
+                          "properties": {
+                            "status": { "type": "string" }
+                          }
+                        },
+                        "processing_phase": {
+                          "type": "object",
+                          "properties": {
+                            "status": { "type": "string" }
+                          }
+                        },
+                        "publishing_phase": {
+                          "type": "object",
+                          "properties": {
+                            "status": { "type": "string" }
+                          }
+                        }
+                      }
+                    },
+                    "id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "cursors": {
+            "type": "object",
+            "properties": {
+              "before": { "type": "string" },
+              "after": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-video-requirements": {
+    "resolution": { "min": "540x960" },
+    "aspect_ratio": "9:16",
+    "frame_rate": { "min": 23 },
+    "duration": { "min": "4 sec", "max": "60 sec" },
+    "formats": ["3g2", "3gp", "3gpp", "asf", "avi", "dat", "divx", "dv", "f4v", "flv", "m2ts", "m4v", "mkv", "mod", "mov", "mp4", "mpe", "mpeg", "mpeg4", "mpg", "mts", "nsv", "ogm", "ogv", "qt", "tod", "ts", "vob", "wmv"]
+  }
+}

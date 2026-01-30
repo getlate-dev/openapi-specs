@@ -1,0 +1,269 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Snapchat Public Profile API",
+    "version": "1.0.0",
+    "description": "Snapchat Public Profile API for retrieving metadata and statistics about Public Profiles and their content. Note: This API is allowlist-only - contact dev-support@snap.com with your OAuth client ID."
+  },
+  "servers": [
+    { "url": "https://adsapi.snapchat.com/v1" }
+  ],
+  "paths": {
+    "/me/organizations": {
+      "get": {
+        "operationId": "getOrganizations",
+        "summary": "Get organizations for authenticated user",
+        "security": [{ "OAuth2": ["snapchat-marketing-api"] }],
+        "responses": {
+          "200": {
+            "description": "List of organizations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "organizations": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Organization" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organizations/{organization_id}/adaccounts": {
+      "get": {
+        "operationId": "getAdAccounts",
+        "summary": "Get ad accounts for organization",
+        "security": [{ "OAuth2": ["snapchat-marketing-api"] }],
+        "parameters": [
+          {
+            "name": "organization_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ad accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adaccounts": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/AdAccount" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public_profiles/{public_profile_id}": {
+      "get": {
+        "operationId": "getPublicProfile",
+        "summary": "Get public profile metadata",
+        "security": [{ "OAuth2": ["snapchat-marketing-api"] }],
+        "parameters": [
+          {
+            "name": "public_profile_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public profile details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public_profiles/{public_profile_id}/organic_stories": {
+      "get": {
+        "operationId": "getOrganicStories",
+        "summary": "Get organic stories for a public profile",
+        "security": [{ "OAuth2": ["snapchat-marketing-api"] }],
+        "parameters": [
+          {
+            "name": "public_profile_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organic stories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "organic_stories": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/OrganicStory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/adaccounts/{ad_account_id}/media": {
+      "post": {
+        "operationId": "uploadMedia",
+        "summary": "Upload media for ads",
+        "security": [{ "OAuth2": ["snapchat-marketing-api"] }],
+        "parameters": [
+          {
+            "name": "ad_account_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "name": { "type": "string" },
+                  "type": { "type": "string", "enum": ["VIDEO", "IMAGE"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Media uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Media"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://accounts.snapchat.com/login/oauth2/authorize",
+            "tokenUrl": "https://accounts.snapchat.com/login/oauth2/access_token",
+            "scopes": {
+              "snapchat-marketing-api": "Access to Marketing API"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "address_line_1": { "type": "string" },
+          "locality": { "type": "string" },
+          "administrative_district_level_1": { "type": "string" },
+          "country": { "type": "string" },
+          "postal_code": { "type": "string" },
+          "type": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AdAccount": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "status": { "type": "string" },
+          "organization_id": { "type": "string" },
+          "currency": { "type": "string" },
+          "timezone": { "type": "string" },
+          "advertiser_organization_id": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PublicProfile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "display_name": { "type": "string" },
+          "title": { "type": "string" },
+          "bio": { "type": "string" },
+          "website_url": { "type": "string" },
+          "profile_picture_url": { "type": "string" },
+          "subscriber_count": { "type": "integer" },
+          "total_view_count": { "type": "integer" },
+          "story_view_count": { "type": "integer" },
+          "spotlight_view_count": { "type": "integer" },
+          "category": { "type": "string" },
+          "verified": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "OrganicStory": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "public_profile_id": { "type": "string" },
+          "name": { "type": "string" },
+          "snap_count": { "type": "integer" },
+          "view_count": { "type": "integer" },
+          "screenshot_count": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "ad_account_id": { "type": "string" },
+          "media_status": { "type": "string" },
+          "download_link": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "x-access-requirements": {
+    "allowlist": "This API requires allowlisting. Send your OAuth client ID to dev-support@snap.com",
+    "scopes": ["snapchat-marketing-api"]
+  }
+}
