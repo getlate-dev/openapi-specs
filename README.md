@@ -22,7 +22,7 @@ OpenAPI/Swagger specifications for social media platforms supported by [Late](ht
 
 ## Usage
 
-Reference specs directly via raw URLs:
+You can reference these specs directly via raw URLs:
 
 ```
 https://raw.githubusercontent.com/getlate-dev/openapi-specs/main/{platform}.json
@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/getlate-dev/openapi-specs/main/{platform}.json
 
 ## Updates
 
-Automatically updated weekly from official and community sources.
+These specs are automatically updated weekly from official and community sources.
 
 ## License
 
