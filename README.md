@@ -35,12 +35,16 @@ Building social media integrations is hard. Each platform has different OAuth fl
 **[Late](https://getlate.dev)** gives you a single API to schedule posts across all 13 platforms. No need to manage tokens, handle rate limits, or deal with platform-specific quirks.
 
 ```bash
-curl -X POST https://api.getlate.dev/v1/posts \
+curl -X POST https://getlate.dev/api/v1/posts \
   -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{
-    "accountId": "acc_123",
     "content": "Hello world!",
-    "scheduledTime": "2025-01-31T10:00:00Z"
+    "platforms": [
+      { "platform": "twitter", "accountId": "acc_123" },
+      { "platform": "linkedin", "accountId": "acc_456" }
+    ],
+    "scheduledFor": "2025-01-31T10:00:00Z"
   }'
 ```
 
