@@ -5,48 +5,62 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "https://graph.facebook.com" },
-    { "url": "https://rupload.facebook.com" }
+    {
+      "url": "https://graph.facebook.com"
+    },
+    {
+      "url": "https://rupload.facebook.com"
+    }
   ],
   "tags": [
     {
       "name": "Tokens",
-      "description": "An access token is a string that identifies a user, app or Page and is used by an app to make Graph API calls. This section will cover the basics of tokens used for the Pages API."
+      "description": "An access token is a string that identifies a user, app or Page and is used by an app to make Graph API calls. This section will cover the basics of tokens used for the Pages API. Make sure the `Facebook` environment is active and the `user_access_token` variable has a value."
     },
     {
       "name": "Reels Publishing",
-      "description": "This section allows developers to upload and publish a Reel into a Facebook page from a local file or CDN. Supported video formats: 3g2, 3gp, 3gpp, asf, avi, dat, divx, dv, f4v, flv, m2ts, m4v, mkv, mod, mov, mp4, mpe, mpeg, mpeg4, mpg, mts, nsv, ogm, ogv, qt, tod, ts, vob, wmv."
+      "description": "This section allows developers to upload and publish a Reel into a Facebook page from a local file or CDN.\n\n**Supported video formats:** `3g2`, `3gp`, `3gpp`, `asf`, `avi`, `dat`, `divx`, `dv`, `f4v`, `flv`, `m2ts`, `m4v`, `mkv`, `mod`, `mov`, `mp4`, `mpe`, `mpeg`, `mpeg4`, `mpg`, `mts`, `nsv`, `ogm`, `ogv`, `qt`, `tod`, `ts`, `vob`, `wmv`.\n\n**Video requirements:**\n\n| Property | Min (or n/a) | Max (or n/a) |\n| --- | --- | --- |\n|   <br>  <br>Resolution  <br>  <br> |   <br>  <br>540 x 960 (540p)  <br>  <br> |   <br>  <br>n/a  <br>  <br> |\n|   <br>  <br>Aspect Ratio  <br>  <br> |   <br>  <br>9x16  <br>  <br> |   <br>  <br>9x16  <br>  <br> |\n|   <br>  <br>Frame Rate  <br>  <br> |   <br>  <br>23  <br>  <br> |   <br>  <br>n/a  <br>  <br> |\n|   <br>  <br>Duration  <br>  <br> |   <br>  <br>4 sec  <br>  <br> |   <br>  <br>60 sec  <br>  <br> |\n|   <br>  <br>File Size  <br>  <br> |   <br>  <br>n/a  <br>  <br> |   <br>  <br>n/a  <br>  <br> |"
     }
   ],
   "paths": {
     "/{api_version}/me/accounts": {
       "get": {
-        "tags": ["Tokens"],
-        "operationId": "getPageAccessTokens",
+        "tags": [
+          "Tokens"
+        ],
         "summary": "Get Access Tokens of Pages You Manage",
-        "description": "This request uses a User Access Token to get a list of all the pages managed by a User.",
+        "description": "This request uses a **User Access Token** to get a list of all the pages managed by a User. Make sure to choose one page from the response list, copy the `ID` into the `page_id` variable and the `access_token` field into the `page_access_token` variable of the environment.\n\nThis new access token is a **Page Access Token**, which acts on behalf of a Page a user has permission to manage.\n\nMore available fields can be found [here](https://developers.facebook.com/docs/graph-api/reference/page/#fields).",
         "parameters": [
           {
             "name": "User-Agent",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "Postman/FacebookCollection"
           },
           {
             "name": "fields",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "name,access_token,tasks"
           },
           {
             "name": "access_token",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{user_access_token}}"
           },
           {
             "name": "api_version",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
@@ -56,24 +70,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": { "type": "string" },
-                          "access_token": { "type": "string" },
-                          "id": { "type": "string" },
-                          "tasks": {
-                            "type": "array",
-                            "items": { "type": "string" }
-                          }
-                        }
-                      }
-                    },
-                    "paging": { "$ref": "#/components/schemas/Paging" }
+                  "type": "object"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "name": "{page_name}",
+                      "access_token": "{page_access_token}",
+                      "id": "{page_id}",
+                      "tasks": [
+                        "PROFILE_PLUS_ADVERTISE",
+                        "PROFILE_PLUS_ANALYZE",
+                        "PROFILE_PLUS_CREATE_CONTENT",
+                        "PROFILE_PLUS_FACEBOOK_ACCESS",
+                        "PROFILE_PLUS_MESSAGING",
+                        "PROFILE_PLUS_MODERATE",
+                        "PROFILE_PLUS_FULL_CONTROL",
+                        "PROFILE_PLUS_MANAGE"
+                      ]
+                    }
+                  ],
+                  "paging": {
+                    "cursors": {
+                      "before": "{cursor}",
+                      "after": "{cursor}"
+                    }
                   }
                 }
               }
@@ -84,38 +105,50 @@
     },
     "/{api_version}/{page_id}": {
       "get": {
-        "tags": ["Tokens"],
-        "operationId": "getSpecificPageAccessToken",
+        "tags": [
+          "Tokens"
+        ],
         "summary": "Get Specific Page Access Token",
-        "description": "If you already have the page_id available, you can query directly this endpoint to get the specific Page Access Token.",
+        "description": "If you already have the `page_id` available, you can query directly this endpoint to get the specific **Page Access Token** you need and avoid having to search for it on the list.\n\nMore available fields can be found [here](https://developers.facebook.com/docs/graph-api/reference/page/#fields).",
         "parameters": [
           {
             "name": "User-Agent",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "Postman/FacebookCollection"
           },
           {
             "name": "fields",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "name,access_token"
           },
           {
             "name": "access_token",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{user_access_token}}"
           },
           {
             "name": "api_version",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           },
           {
             "name": "page_id",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
@@ -125,12 +158,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": { "type": "string" },
-                    "access_token": { "type": "string" },
-                    "id": { "type": "string" }
-                  }
+                  "type": "object"
+                },
+                "example": {
+                  "name": "{page_name}",
+                  "access_token": "{page_access_token}",
+                  "id": "{page_id}"
                 }
               }
             }
@@ -140,71 +173,210 @@
     },
     "/{api_version}/me/video_reels": {
       "post": {
-        "tags": ["Reels Publishing"],
-        "operationId": "publishReel",
-        "summary": "Publish Reel",
+        "tags": [
+          "Reels Publishing"
+        ],
+        "summary": "4. Publish Reel",
         "description": "Ends the upload phase to start assembling and encoding the video. You can also customize the reel with the optional parameters.",
-        "requestBody": { "content": {} },
+        "requestBody": {
+          "content": {}
+        },
         "parameters": [
           {
             "name": "User-Agent",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "Postman/FacebookCollection"
           },
           {
             "name": "access_token",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{page_access_token}}"
           },
           {
             "name": "video_id",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{video_id}}"
           },
           {
             "name": "upload_phase",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Signal to finish the upload phase",
             "example": "finish"
           },
           {
             "name": "video_state",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Possible values: DRAFT, SCHEDULED, PUBLISHED",
             "example": "PUBLISHED"
           },
           {
             "name": "description",
             "in": "query",
-            "schema": { "type": "string" },
-            "description": "Optional"
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional",
+            "example": "Description text goes here"
           },
           {
             "name": "title",
             "in": "query",
-            "schema": { "type": "string" },
-            "description": "Optional"
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional",
+            "example": "Title goes here"
           },
           {
             "name": "api_version",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string",
+                  "example": "Origin"
+                }
+              },
+              "cross-origin-resource-policy": {
+                "schema": {
+                  "type": "string",
+                  "example": "cross-origin"
+                }
+              },
+              "x-app-usage": {
+                "schema": {
+                  "type": "string",
+                  "example": "{\"call_count\":1,\"total_cputime\":0,\"total_time\":0}"
+                }
+              },
+              "x-fb-rlafr": {
+                "schema": {
+                  "type": "integer",
+                  "example": "0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "example": "*"
+                }
+              },
+              "facebook-api-version": {
+                "schema": {
+                  "type": "string",
+                  "example": "v15.0"
+                }
+              },
+              "Strict-Transport-Security": {
+                "schema": {
+                  "type": "string",
+                  "example": "max-age=15552000; preload"
+                }
+              },
+              "Pragma": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-cache"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "private, no-cache, no-store, must-revalidate"
+                }
+              },
+              "Expires": {
+                "schema": {
+                  "type": "string",
+                  "example": "Sat, 01 Jan 2000 00:00:00 GMT"
+                }
+              },
+              "x-fb-request-id": {
+                "schema": {
+                  "type": "string",
+                  "example": "AJ9tjh3JJzqjtWaOkFI-J3e"
+                }
+              },
+              "x-fb-trace-id": {
+                "schema": {
+                  "type": "string",
+                  "example": "HRwT1EQLaGm"
+                }
+              },
+              "x-fb-rev": {
+                "schema": {
+                  "type": "integer",
+                  "example": "1006997027"
+                }
+              },
+              "X-FB-Debug": {
+                "schema": {
+                  "type": "string",
+                  "example": "py3HcPTKDaAb5Bfn5m2eVUDyWu1KoY+M0CyqSOlq3I2VZ01+SbbXoW/7ilLi6XVP/Uft5xxckld9I2NPDWLOdQ=="
+                }
+              },
+              "Date": {
+                "schema": {
+                  "type": "string",
+                  "example": "Wed, 22 Feb 2023 23:27:11 GMT"
+                }
+              },
+              "Alt-Svc": {
+                "schema": {
+                  "type": "string",
+                  "example": "h3=\":443\"; ma=86400"
+                }
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string",
+                  "example": "keep-alive"
+                }
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "example": "16"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" }
-                  }
+                  "type": "object"
+                },
+                "example": {
+                  "success": true
                 }
               }
             }
@@ -214,53 +386,93 @@
     },
     "/video-upload/{api_version}/{video_id}": {
       "post": {
-        "tags": ["Reels Publishing"],
-        "operationId": "uploadHostedReel",
-        "summary": "Upload Hosted Reel",
-        "description": "This method is used when the video source is hosted on a CDN. The video link must be included in the file_url header.",
-        "requestBody": { "content": {} },
+        "tags": [
+          "Reels Publishing"
+        ],
+        "summary": "2.B Upload Hosted Reel",
+        "description": "This method is used when the video source is hosted on a CDN. The video link must be included in the **file_url** header.",
+        "requestBody": {
+          "content": {}
+        },
         "parameters": [
           {
             "name": "Authorization",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "OAuth {{page_access_token}}"
           },
           {
             "name": "file_url",
             "in": "header",
-            "schema": { "type": "string" },
-            "description": "Replace with your own web hosted video URL"
+            "schema": {
+              "type": "string"
+            },
+            "description": "Replace with your own web hosted video URL",
+            "example": "{{video_url}}"
           },
           {
             "name": "User-Agent",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "Postman/FacebookCollection"
           },
           {
             "name": "api_version",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           },
           {
             "name": "video_id",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json"
+                }
+              },
+              "Date": {
+                "schema": {
+                  "type": "string",
+                  "example": "Wed, 22 Feb 2023 23:26:42 GMT"
+                }
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string",
+                  "example": "keep-alive"
+                }
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "example": "16"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" }
-                  }
+                  "type": "object"
+                },
+                "example": {
+                  "success": true
                 }
               }
             }
@@ -270,76 +482,198 @@
     },
     "/{api_version}/{video_id}": {
       "get": {
-        "tags": ["Reels Publishing"],
-        "operationId": "getUploadSessionStatus",
-        "summary": "Get upload session status",
+        "tags": [
+          "Reels Publishing"
+        ],
+        "summary": "3. (Optional) Get upload session status",
         "description": "Retrieves the status of the Reels publishing operation composed of three steps: uploading, processing and publishing.",
         "parameters": [
           {
             "name": "User-Agent",
             "in": "header",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "Postman/FacebookCollection"
           },
           {
             "name": "fields",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "status"
           },
           {
             "name": "access_token",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{page_access_token}}"
           },
           {
             "name": "api_version",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           },
           {
             "name": "video_id",
             "in": "path",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "example": "br"
+                }
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "example": "\"6ab5701075380375ed5bc01236a21b055a83d37c\""
+                }
+              },
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string",
+                  "example": "Accept-Encoding"
+                }
+              },
+              "x-business-use-case-usage": {
+                "schema": {
+                  "type": "string",
+                  "example": "{\"109230415097675\":[{\"type\":\"pages\",\"call_count\":1,\"total_cputime\":1,\"total_time\":1,\"estimated_time_to_regain_access\":0}]}"
+                }
+              },
+              "x-fb-rlafr": {
+                "schema": {
+                  "type": "integer",
+                  "example": "0"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string",
+                  "example": "*"
+                }
+              },
+              "facebook-api-version": {
+                "schema": {
+                  "type": "string",
+                  "example": "v15.0"
+                }
+              },
+              "Strict-Transport-Security": {
+                "schema": {
+                  "type": "string",
+                  "example": "max-age=15552000; preload"
+                }
+              },
+              "Pragma": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-cache"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "private, no-cache, no-store, must-revalidate"
+                }
+              },
+              "Expires": {
+                "schema": {
+                  "type": "string",
+                  "example": "Sat, 01 Jan 2000 00:00:00 GMT"
+                }
+              },
+              "x-fb-request-id": {
+                "schema": {
+                  "type": "string",
+                  "example": "A6-9Zr5dtxnkpc3tz2H8w6b"
+                }
+              },
+              "x-fb-trace-id": {
+                "schema": {
+                  "type": "string",
+                  "example": "CE4WnhZFH5z"
+                }
+              },
+              "x-fb-rev": {
+                "schema": {
+                  "type": "integer",
+                  "example": "1006997027"
+                }
+              },
+              "X-FB-Debug": {
+                "schema": {
+                  "type": "string",
+                  "example": "UsTAEXvYsJNv99KrWSSW3T/sq4FJeBd+4dsutS5J7mVF50lADN+Z/lxb3h1IUvwua+r5xcvo1NANuv5a1t+9zg=="
+                }
+              },
+              "Date": {
+                "schema": {
+                  "type": "string",
+                  "example": "Wed, 22 Feb 2023 23:26:55 GMT"
+                }
+              },
+              "Alt-Svc": {
+                "schema": {
+                  "type": "string",
+                  "example": "h3=\":443\"; ma=86400"
+                }
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string",
+                  "example": "close"
+                }
+              },
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "example": "110"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "object",
-                      "properties": {
-                        "video_status": { "type": "string" },
-                        "processing_progress": { "type": "integer" },
-                        "uploading_phase": {
-                          "type": "object",
-                          "properties": {
-                            "status": { "type": "string" }
-                          }
-                        },
-                        "processing_phase": {
-                          "type": "object",
-                          "properties": {
-                            "status": { "type": "string" }
-                          }
-                        },
-                        "publishing_phase": {
-                          "type": "object",
-                          "properties": {
-                            "status": { "type": "string" }
-                          }
-                        }
-                      }
+                  "type": "object"
+                },
+                "example": {
+                  "status": {
+                    "video_status": "processing",
+                    "processing_progress": 0,
+                    "uploading_phase": {
+                      "status": "complete"
                     },
-                    "id": { "type": "string" }
-                  }
+                    "processing_phase": {
+                      "status": "not_started"
+                    },
+                    "publishing_phase": {
+                      "status": "not_started"
+                    }
+                  },
+                  "id": "2210969582438920"
                 }
               }
             }
@@ -347,28 +681,5 @@
         }
       }
     }
-  },
-  "components": {
-    "schemas": {
-      "Paging": {
-        "type": "object",
-        "properties": {
-          "cursors": {
-            "type": "object",
-            "properties": {
-              "before": { "type": "string" },
-              "after": { "type": "string" }
-            }
-          }
-        }
-      }
-    }
-  },
-  "x-video-requirements": {
-    "resolution": { "min": "540x960" },
-    "aspect_ratio": "9:16",
-    "frame_rate": { "min": 23 },
-    "duration": { "min": "4 sec", "max": "60 sec" },
-    "formats": ["3g2", "3gp", "3gpp", "asf", "avi", "dat", "divx", "dv", "f4v", "flv", "m2ts", "m4v", "mkv", "mod", "mov", "mp4", "mpe", "mpeg", "mpeg4", "mpg", "mts", "nsv", "ogm", "ogv", "qt", "tod", "ts", "vob", "wmv"]
   }
 }

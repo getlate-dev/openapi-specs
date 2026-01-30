@@ -5,7 +5,9 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "https://www.threads.net" }
+    {
+      "url": "https://www.threads.net"
+    }
   ],
   "paths": {
     "/api/graphql/getUserProfile": {
@@ -16,13 +18,17 @@
             "name": "username",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "userId",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -30,7 +36,9 @@
             "description": "A ThreadsUser object",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetUserProfileResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserProfileResponse"
+                }
               }
             }
           }
@@ -45,13 +53,17 @@
             "name": "username",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "userId",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -59,7 +71,9 @@
             "description": "An array of Thread objects",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetUserProfileThreadsResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserProfileThreadsResponse"
+                }
               }
             }
           }
@@ -74,13 +88,17 @@
             "name": "username",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "userId",
             "in": "header",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -88,7 +106,9 @@
             "description": "An array of Thread objects",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/GetUserProfileRepliesResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserProfileRepliesResponse"
+                }
               }
             }
           }
@@ -107,12 +127,16 @@
               "userData": {
                 "type": "object",
                 "properties": {
-                  "user": { "$ref": "#/components/schemas/ThreadsUser" }
+                  "user": {
+                    "$ref": "#/components/schemas/ThreadsUser"
+                  }
                 }
               }
             }
           },
-          "extensions": { "$ref": "#/components/schemas/Extensions" }
+          "extensions": {
+            "$ref": "#/components/schemas/Extensions"
+          }
         }
       },
       "GetUserProfileThreadsResponse": {
@@ -126,13 +150,17 @@
                 "properties": {
                   "threads": {
                     "type": "array",
-                    "items": { "$ref": "#/components/schemas/Thread" }
+                    "items": {
+                      "$ref": "#/components/schemas/Thread"
+                    }
                   }
                 }
               }
             }
           },
-          "extensions": { "$ref": "#/components/schemas/Extensions" }
+          "extensions": {
+            "$ref": "#/components/schemas/Extensions"
+          }
         }
       },
       "GetUserProfileRepliesResponse": {
@@ -146,13 +174,17 @@
                 "properties": {
                   "threads": {
                     "type": "array",
-                    "items": { "$ref": "#/components/schemas/Thread" }
+                    "items": {
+                      "$ref": "#/components/schemas/Thread"
+                    }
                   }
                 }
               }
             }
           },
-          "extensions": { "$ref": "#/components/schemas/Extensions" }
+          "extensions": {
+            "$ref": "#/components/schemas/Extensions"
+          }
         }
       },
       "Extensions": {
