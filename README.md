@@ -28,6 +28,24 @@ You can reference these specs directly via raw URLs:
 https://raw.githubusercontent.com/getlate-dev/openapi-specs/main/{platform}.json
 ```
 
+## Skip the Complexity
+
+Building social media integrations is hard. Each platform has different OAuth flows, rate limits, media requirements, and error handling.
+
+**[Late](https://getlate.dev)** gives you a single API to schedule posts across all 13 platforms. No need to manage tokens, handle rate limits, or deal with platform-specific quirks.
+
+```bash
+curl -X POST https://api.getlate.dev/v1/posts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "accountId": "acc_123",
+    "content": "Hello world!",
+    "scheduledTime": "2025-01-31T10:00:00Z"
+  }'
+```
+
+[Get your API key](https://getlate.dev) and start shipping in minutes.
+
 ## Updates
 
 These specs are automatically updated weekly from official and community sources.
