@@ -39,9 +39,9 @@ These specs work with any OpenAPI-compatible tool:
 
 ## 💜 About Late
 
-**[Late](https://getlate.dev)** is the all-in-one social media scheduling tool that supports all 13 platforms listed above. Schedule posts, manage multiple accounts, and grow your audience from a single dashboard.
+**[Late](https://getlate.dev)** is a social media API for developers. One unified API to publish content across all 13 platforms listed above. No need to wrangle individual platform APIs, OAuth flows, or rate limits yourself.
 
-👉 **[Try Late for free](https://getlate.dev)** — No credit card required.
+👉 **[Get started](https://getlate.dev)** — Start building for free.
 
 📺 **[Watch the demo](https://www.youtube.com/watch?v=2TzRQn-Ib_s)**
 
