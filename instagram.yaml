@@ -16,8 +16,8 @@ info:
     url: https://developers.facebook.com/terms/
 
 servers:
-  - url: https://graph.instagram.com/v24.0
-    description: Instagram Graph API v24.0
+  - url: https://graph.instagram.com
+    description: Instagram Graph API
 
 security:
   - facebook_auth: []
