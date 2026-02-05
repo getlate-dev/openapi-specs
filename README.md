@@ -20,8 +20,8 @@ Use these specs to explore, test, and build integrations with the APIs behind th
 | Facebook | `facebook.yaml` | 28 | Official docs |
 | Snapchat | `snapchat.yaml` | 27 | Official docs |
 | LinkedIn | `linkedin.yaml` | 27 | Official docs |
-| TikTok | `tiktok.yaml` | 22 | Official docs |
-| **Total** | | **760** | **13 platforms** |
+| TikTok | `tiktok.yaml` | 23 | Official docs |
+| **Total** | | **761** | **13 platforms** |
 
 ## 🔍 Sources
 
