@@ -6,7 +6,7 @@ info:
     access to manage business location information on Google. This comprehensive API enables 
     businesses and developers to:
     
-    **Core Features:**
+    **Core Features (v4 API - mybusiness.googleapis.com):**
     - **Accounts**: Manage business accounts and admin permissions  
     - **Locations**: Create, update, and manage business locations
     - **Posts**: Create and manage local posts for business promotion
@@ -15,12 +15,20 @@ info:
     - **Q&A**: Handle questions and answers from customers
     - **Verification**: Verify business location ownership
     - **Insights**: Access performance analytics and reporting
+    - **Food Menus**: Manage restaurant menus, sections, items, and attributes
+    
+    **Business Information API v1 (mybusinessbusinessinformation.googleapis.com):**
+    - **Locations v1**: Current recommended API for location management
     - **Attributes**: Manage location-specific business attributes
     - **Categories**: Access business category information
+    - **Chains**: Search and manage business chains
+    - **Google Locations**: Search for matching Google locations
+    
+    **Place Actions API v1 (mybusinessplaceactions.googleapis.com):**
+    - **Place Actions**: Manage action links for appointments, reservations, food ordering, etc.
     
     **Authentication:** OAuth 2.0 with Google Account
-    **Base URL:** https://mybusiness.googleapis.com
-  version: "4.0"
+  version: "4.1"
   contact:
     name: Google Business Profile API
     url: https://developers.google.com/my-business
@@ -29,7 +37,11 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0
 servers:
   - url: https://mybusiness.googleapis.com
-    description: Google Business Profile API
+    description: Google Business Profile API (v4)
+  - url: https://mybusinessbusinessinformation.googleapis.com
+    description: Business Information API (v1) - Locations, Attributes, Categories
+  - url: https://mybusinessplaceactions.googleapis.com
+    description: Place Actions API (v1) - Action Links for reservations, ordering, etc.
 
 paths:
   # Accounts Management
@@ -1079,6 +1091,763 @@ paths:
       security:
         - OAuth2: [https://www.googleapis.com/auth/business.manage]
 
+  # ===========================================
+  # Food Menus (v4 API - mybusiness.googleapis.com)
+  # ===========================================
+  /v4/{parent}/foodMenus:
+    get:
+      tags: [Food Menus]
+      summary: Get food menus
+      description: Returns the food menus for a location
+      servers:
+        - url: https://mybusiness.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Location resource name (accounts/{accountId}/locations/{locationId})
+          schema:
+            type: string
+            example: "accounts/123456789/locations/987654321"
+      responses:
+        '200':
+          description: Food menus retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodMenus'
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    patch:
+      tags: [Food Menus]
+      summary: Update food menus
+      description: Updates the food menus for a location
+      servers:
+        - url: https://mybusiness.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Location resource name
+          schema:
+            type: string
+        - name: updateMask
+          in: query
+          description: Fields to update (comma-separated field paths)
+          schema:
+            type: string
+            example: "menus"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodMenus'
+      responses:
+        '200':
+          description: Food menus updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodMenus'
+        '400':
+          description: Invalid request
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # ===========================================
+  # Business Information API v1 (mybusinessbusinessinformation.googleapis.com)
+  # ===========================================
+  
+  # Locations v1
+  /v1/{name}:
+    get:
+      tags: [Locations v1]
+      summary: Get location
+      description: Returns the specified location
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Location resource name (locations/{locationId})
+          schema:
+            type: string
+            example: "locations/987654321"
+        - name: readMask
+          in: query
+          description: Fields to return (comma-separated field paths)
+          schema:
+            type: string
+            example: "name,title,storefrontAddress"
+      responses:
+        '200':
+          description: Location retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationV1'
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    patch:
+      tags: [Locations v1]
+      summary: Update location
+      description: Updates the specified location
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Location resource name
+          schema:
+            type: string
+        - name: updateMask
+          in: query
+          required: true
+          description: Fields to update (comma-separated field paths)
+          schema:
+            type: string
+            example: "title,storefrontAddress"
+        - name: validateOnly
+          in: query
+          description: Only validate the request without updating
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationV1'
+      responses:
+        '200':
+          description: Location updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationV1'
+        '400':
+          description: Invalid request
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    delete:
+      tags: [Locations v1]
+      summary: Delete location
+      description: Deletes a location
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Location resource name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location deleted successfully
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/{parent}/locations:
+    get:
+      tags: [Locations v1]
+      summary: List locations
+      description: Lists the locations for the specified account
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Account resource name (accounts/{accountId})
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          description: Number of locations to return
+          schema:
+            type: integer
+            maximum: 100
+        - name: pageToken
+          in: query
+          description: Pagination token
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: Filter expression
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          description: Sort order
+          schema:
+            type: string
+        - name: readMask
+          in: query
+          description: Fields to return
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Locations listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListLocationsResponseV1'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    post:
+      tags: [Locations v1]
+      summary: Create location
+      description: Creates a new location owned by the logged in user
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Account resource name
+          schema:
+            type: string
+        - name: validateOnly
+          in: query
+          description: Only validate without creating
+          schema:
+            type: boolean
+        - name: requestId
+          in: query
+          description: Unique request ID for idempotency
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationV1'
+      responses:
+        '200':
+          description: Location created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationV1'
+        '400':
+          description: Invalid request
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # Attributes v1
+  /v1/{name}/attributes:
+    get:
+      tags: [Attributes]
+      summary: Get location attributes
+      description: Looks up all the attributes set for a given location
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Location resource name (locations/{locationId})
+          schema:
+            type: string
+            example: "locations/987654321"
+      responses:
+        '200':
+          description: Attributes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attributes'
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    patch:
+      tags: [Attributes]
+      summary: Update location attributes
+      description: Updates the attributes for a given location
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Location resource name
+          schema:
+            type: string
+        - name: attributeMask
+          in: query
+          description: Attribute names to update (comma-separated)
+          schema:
+            type: string
+            example: "url_appointment,has_wheelchair_accessible_entrance"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Attributes'
+      responses:
+        '200':
+          description: Attributes updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attributes'
+        '400':
+          description: Invalid request
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/attributes:
+    get:
+      tags: [Attributes]
+      summary: List available attributes
+      description: Returns the list of attributes that would be available for a location with the given primary category and country
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: categoryName
+          in: query
+          description: Primary category stable ID
+          schema:
+            type: string
+        - name: regionCode
+          in: query
+          description: ISO 3166-1 alpha-2 country code
+          schema:
+            type: string
+        - name: languageCode
+          in: query
+          description: BCP 47 language code
+          schema:
+            type: string
+        - name: showAll
+          in: query
+          description: Show all available attributes
+          schema:
+            type: boolean
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: pageToken
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Attributes listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAttributeMetadataResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # Categories v1
+  /v1/categories:
+    get:
+      tags: [Categories]
+      summary: List categories
+      description: Returns a list of business categories
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: regionCode
+          in: query
+          description: ISO 3166-1 alpha-2 country code
+          schema:
+            type: string
+        - name: languageCode
+          in: query
+          description: BCP 47 language code
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: Filter expression for searchable categories
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: pageToken
+          in: query
+          schema:
+            type: string
+        - name: view
+          in: query
+          description: Category view (BASIC or FULL)
+          schema:
+            type: string
+            enum: [CATEGORY_VIEW_UNSPECIFIED, BASIC, FULL]
+      responses:
+        '200':
+          description: Categories listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCategoriesResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/categories:batchGet:
+    get:
+      tags: [Categories]
+      summary: Batch get categories
+      description: Returns a list of business categories for the provided language and GConcept ids
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: names
+          in: query
+          description: Category resource names
+          schema:
+            type: array
+            items:
+              type: string
+        - name: languageCode
+          in: query
+          description: BCP 47 language code
+          schema:
+            type: string
+        - name: regionCode
+          in: query
+          description: ISO 3166-1 alpha-2 country code
+          schema:
+            type: string
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [CATEGORY_VIEW_UNSPECIFIED, BASIC, FULL]
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchGetCategoriesResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # Chains v1
+  /v1/{name}:
+    get:
+      tags: [Chains]
+      summary: Get chain
+      description: Gets the specified chain
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Chain resource name (chains/{chainId})
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chain retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chain'
+        '404':
+          description: Chain not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/chains:search:
+    get:
+      tags: [Chains]
+      summary: Search chains
+      description: Searches the chain based on chain name
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      parameters:
+        - name: chainName
+          in: query
+          required: true
+          description: Search query for chain name
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Chains found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchChainsResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # Google Locations v1
+  /v1/googleLocations:search:
+    post:
+      tags: [Google Locations]
+      summary: Search Google locations
+      description: Search all possible locations that match the specified request
+      servers:
+        - url: https://mybusinessbusinessinformation.googleapis.com
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  $ref: '#/components/schemas/LocationV1'
+                query:
+                  type: string
+                  description: Text query to search for
+                pageSize:
+                  type: integer
+      responses:
+        '200':
+          description: Search results returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchGoogleLocationsResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  # ===========================================
+  # Place Actions API v1 (mybusinessplaceactions.googleapis.com)
+  # ===========================================
+  /v1/{parent}/placeActionLinks:
+    get:
+      tags: [Place Actions]
+      summary: List place action links
+      description: Lists the place action links for the specified location
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Location resource name (locations/{locationId})
+          schema:
+            type: string
+            example: "locations/987654321"
+        - name: filter
+          in: query
+          description: Filter by place action type
+          schema:
+            type: string
+            example: "placeActionType=APPOINTMENT"
+        - name: pageSize
+          in: query
+          description: Number of links to return
+          schema:
+            type: integer
+            maximum: 100
+        - name: pageToken
+          in: query
+          description: Pagination token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Place action links listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPlaceActionLinksResponse'
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    post:
+      tags: [Place Actions]
+      summary: Create place action link
+      description: Creates a place action link for the specified location
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: parent
+          in: path
+          required: true
+          description: Location resource name
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceActionLink'
+            example:
+              placeActionType: "APPOINTMENT"
+              uri: "https://example.com/book"
+      responses:
+        '200':
+          description: Place action link created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceActionLink'
+        '400':
+          description: Invalid request or duplicate link
+        '404':
+          description: Location not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/{name}:
+    get:
+      tags: [Place Actions]
+      summary: Get place action link
+      description: Gets the specified place action link
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Place action link resource name (locations/{locationId}/placeActionLinks/{linkId})
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Place action link retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceActionLink'
+        '404':
+          description: Place action link not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    patch:
+      tags: [Place Actions]
+      summary: Update place action link
+      description: Updates the specified place action link
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Place action link resource name
+          schema:
+            type: string
+        - name: updateMask
+          in: query
+          description: Fields to update
+          schema:
+            type: string
+            example: "uri"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceActionLink'
+      responses:
+        '200':
+          description: Place action link updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceActionLink'
+        '400':
+          description: Invalid request
+        '404':
+          description: Place action link not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+    delete:
+      tags: [Place Actions]
+      summary: Delete place action link
+      description: Deletes a place action link from the specified location
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Place action link resource name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Place action link deleted successfully
+        '404':
+          description: Place action link not found
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
+  /v1/placeActionTypeMetadata:
+    get:
+      tags: [Place Actions]
+      summary: List place action type metadata
+      description: Returns the list of available place action types for a location or country
+      servers:
+        - url: https://mybusinessplaceactions.googleapis.com
+      parameters:
+        - name: languageCode
+          in: query
+          description: BCP 47 language code
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+        - name: pageToken
+          in: query
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: Filter by location name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Place action types listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPlaceActionTypeMetadataResponse'
+      security:
+        - OAuth2: [https://www.googleapis.com/auth/business.manage]
+
 components:
   securitySchemes:
     OAuth2:
@@ -2042,6 +2811,723 @@ components:
           type: string
           enum: [SEVEN, THIRTY]
 
+    # ===========================================
+    # Food Menus Schemas
+    # ===========================================
+    FoodMenus:
+      type: object
+      description: Container for food menus for a location
+      properties:
+        name:
+          type: string
+          description: Resource name (accounts/{accountId}/locations/{locationId}/foodMenus)
+        menus:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodMenu'
+
+    FoodMenu:
+      type: object
+      description: Represents a single food menu
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuLabel'
+        sourceUrl:
+          type: string
+          format: uri
+          description: URL where this menu can be found
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodMenuSection'
+        cuisines:
+          type: array
+          items:
+            type: string
+            enum: [CUISINE_UNSPECIFIED, AMERICAN, ASIAN, BRAZILIAN, CHINESE, FRENCH, GREEK, INDIAN, ITALIAN, JAPANESE, KOREAN, MEDITERRANEAN, MEXICAN, MIDDLE_EASTERN, THAI, VIETNAMESE, OTHER]
+
+    MenuLabel:
+      type: object
+      description: Label with language code
+      properties:
+        displayName:
+          type: string
+          description: Display name for the menu
+        description:
+          type: string
+          description: Description text
+        languageCode:
+          type: string
+          description: BCP 47 language code
+
+    FoodMenuSection:
+      type: object
+      description: Section of a food menu
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuLabel'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodMenuItem'
+
+    FoodMenuItem:
+      type: object
+      description: Individual food menu item
+      required:
+        - labels
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuLabel'
+        attributes:
+          $ref: '#/components/schemas/FoodMenuItemAttributes'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodMenuItemOption'
+
+    FoodMenuItemAttributes:
+      type: object
+      description: Attributes of a food menu item
+      properties:
+        price:
+          $ref: '#/components/schemas/Money'
+        spiciness:
+          type: string
+          enum: [SPICINESS_UNSPECIFIED, MILD, MEDIUM, HOT]
+        allergen:
+          type: array
+          items:
+            type: string
+            enum: [ALLERGEN_UNSPECIFIED, DAIRY, EGG, FISH, PEANUTS, SHELLFISH, SOY, TREE_NUTS, WHEAT, GLUTEN, SESAME, SULFITES]
+        dietaryRestriction:
+          type: array
+          items:
+            type: string
+            enum: [DIETARY_RESTRICTION_UNSPECIFIED, HALAL, KOSHER, ORGANIC, VEGAN, VEGETARIAN, GLUTEN_FREE]
+        nutritionFacts:
+          $ref: '#/components/schemas/NutritionFacts'
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuLabel'
+        servesNumPeople:
+          type: integer
+        preparationMethods:
+          type: array
+          items:
+            type: string
+            enum: [PREPARATION_METHOD_UNSPECIFIED, BAKED, BARBECUED, BRAISED, BREADED, BROILED, DEEP_FRIED, FRIED, GRILLED, POACHED, ROASTED, SAUTEED, SMOKED, STEAMED, STIR_FRIED]
+        portionSize:
+          $ref: '#/components/schemas/PortionSize'
+        mediaKeys:
+          type: array
+          items:
+            type: string
+          description: Media keys for photos of this item
+
+    FoodMenuItemOption:
+      type: object
+      description: Option/variation for a food menu item
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuLabel'
+        attributes:
+          $ref: '#/components/schemas/FoodMenuItemAttributes'
+
+    Money:
+      type: object
+      description: Represents an amount of money with currency
+      properties:
+        currencyCode:
+          type: string
+          description: ISO 4217 currency code
+        units:
+          type: string
+          description: Whole units of the amount
+        nanos:
+          type: integer
+          description: Nano units (10^-9) of the amount
+
+    NutritionFacts:
+      type: object
+      description: Nutrition information for a food item
+      properties:
+        calories:
+          $ref: '#/components/schemas/CaloriesFact'
+        totalFat:
+          $ref: '#/components/schemas/NutritionFact'
+        cholesterol:
+          $ref: '#/components/schemas/NutritionFact'
+        sodium:
+          $ref: '#/components/schemas/NutritionFact'
+        totalCarbohydrate:
+          $ref: '#/components/schemas/NutritionFact'
+        protein:
+          $ref: '#/components/schemas/NutritionFact'
+
+    CaloriesFact:
+      type: object
+      properties:
+        lowerAmount:
+          type: integer
+        upperAmount:
+          type: integer
+        unit:
+          type: string
+          enum: [CALORIE, JOULE]
+
+    NutritionFact:
+      type: object
+      properties:
+        lowerAmount:
+          type: number
+        upperAmount:
+          type: number
+        unit:
+          type: string
+          enum: [GRAM, MILLIGRAM]
+
+    PortionSize:
+      type: object
+      properties:
+        quantity:
+          type: number
+        unit:
+          $ref: '#/components/schemas/MenuLabel'
+
+    # ===========================================
+    # Business Information v1 Schemas
+    # ===========================================
+    LocationV1:
+      type: object
+      description: Location in v1 API format
+      properties:
+        name:
+          type: string
+          description: Resource name (locations/{locationId})
+        title:
+          type: string
+          description: Location name as displayed to users
+        phoneNumbers:
+          $ref: '#/components/schemas/PhoneNumbers'
+        categories:
+          $ref: '#/components/schemas/CategoriesV1'
+        storefrontAddress:
+          $ref: '#/components/schemas/PostalAddress'
+        websiteUri:
+          type: string
+          format: uri
+        regularHours:
+          $ref: '#/components/schemas/BusinessHours'
+        specialHours:
+          $ref: '#/components/schemas/SpecialHours'
+        serviceArea:
+          $ref: '#/components/schemas/ServiceArea'
+        labels:
+          type: array
+          items:
+            type: string
+        adWordsLocationExtensions:
+          $ref: '#/components/schemas/AdWordsLocationExtensions'
+        latlng:
+          $ref: '#/components/schemas/LatLng'
+        openInfo:
+          $ref: '#/components/schemas/OpenInfo'
+        metadata:
+          $ref: '#/components/schemas/LocationMetadataV1'
+        profile:
+          $ref: '#/components/schemas/Profile'
+        relationshipData:
+          $ref: '#/components/schemas/RelationshipData'
+        moreHours:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoreHours'
+        serviceItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceItem'
+
+    CategoriesV1:
+      type: object
+      properties:
+        primaryCategory:
+          $ref: '#/components/schemas/CategoryV1'
+        additionalCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryV1'
+
+    CategoryV1:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Resource name (categories/{categoryId})
+        displayName:
+          type: string
+        serviceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceType'
+        moreHoursTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoreHoursType'
+
+    ServiceType:
+      type: object
+      properties:
+        serviceTypeId:
+          type: string
+        displayName:
+          type: string
+
+    MoreHoursType:
+      type: object
+      properties:
+        hoursTypeId:
+          type: string
+        displayName:
+          type: string
+        localizedDisplayName:
+          type: string
+
+    PostalAddress:
+      type: object
+      description: Physical address
+      properties:
+        regionCode:
+          type: string
+          description: CLDR region code
+        languageCode:
+          type: string
+        postalCode:
+          type: string
+        administrativeArea:
+          type: string
+        locality:
+          type: string
+        addressLines:
+          type: array
+          items:
+            type: string
+        recipients:
+          type: array
+          items:
+            type: string
+
+    ServiceArea:
+      type: object
+      properties:
+        businessType:
+          type: string
+          enum: [BUSINESS_TYPE_UNSPECIFIED, CUSTOMER_LOCATION_ONLY, CUSTOMER_AND_BUSINESS_LOCATION]
+        places:
+          type: object
+          properties:
+            placeInfos:
+              type: array
+              items:
+                type: object
+                properties:
+                  placeName:
+                    type: string
+                  placeId:
+                    type: string
+        regionCode:
+          type: string
+
+    LatLng:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+
+    LocationMetadataV1:
+      type: object
+      properties:
+        mapsUri:
+          type: string
+          format: uri
+        newReviewUri:
+          type: string
+          format: uri
+        canDelete:
+          type: boolean
+        canOperateLocalPost:
+          type: boolean
+        canModifyServiceList:
+          type: boolean
+        canHaveFoodMenus:
+          type: boolean
+        canOperateHealthData:
+          type: boolean
+        canOperateLodgingData:
+          type: boolean
+        placeId:
+          type: string
+        duplicateLocation:
+          type: string
+        hasGoogleUpdated:
+          type: boolean
+        hasPendingEdits:
+          type: boolean
+        canHaveBusinessCalls:
+          type: boolean
+        hasVoiceOfMerchant:
+          type: boolean
+
+    Profile:
+      type: object
+      properties:
+        description:
+          type: string
+
+    RelationshipData:
+      type: object
+      properties:
+        parentLocation:
+          $ref: '#/components/schemas/RelevantLocation'
+        childrenLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelevantLocation'
+        parentChain:
+          type: string
+          description: Chain resource name
+
+    RelevantLocation:
+      type: object
+      properties:
+        placeId:
+          type: string
+        relationType:
+          type: string
+          enum: [RELATION_TYPE_UNSPECIFIED, DEPARTMENT_OF, INDEPENDENT_ESTABLISHMENT_IN]
+
+    MoreHours:
+      type: object
+      properties:
+        hoursTypeId:
+          type: string
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimePeriod'
+
+    ServiceItem:
+      type: object
+      properties:
+        structuredServiceItem:
+          $ref: '#/components/schemas/StructuredServiceItem'
+        freeFormServiceItem:
+          $ref: '#/components/schemas/FreeFormServiceItem'
+        price:
+          $ref: '#/components/schemas/Money'
+
+    StructuredServiceItem:
+      type: object
+      properties:
+        serviceTypeId:
+          type: string
+        description:
+          type: string
+
+    FreeFormServiceItem:
+      type: object
+      properties:
+        category:
+          type: string
+        label:
+          $ref: '#/components/schemas/MenuLabel'
+
+    SpecialHours:
+      type: object
+      properties:
+        specialHourPeriods:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecialHourPeriod'
+
+    SpecialHourPeriod:
+      type: object
+      properties:
+        startDate:
+          $ref: '#/components/schemas/Date'
+        openTime:
+          $ref: '#/components/schemas/TimeOfDay'
+        endDate:
+          $ref: '#/components/schemas/Date'
+        closeTime:
+          $ref: '#/components/schemas/TimeOfDay'
+        closed:
+          type: boolean
+
+    TimeOfDay:
+      type: object
+      properties:
+        hours:
+          type: integer
+          minimum: 0
+          maximum: 23
+        minutes:
+          type: integer
+          minimum: 0
+          maximum: 59
+        seconds:
+          type: integer
+        nanos:
+          type: integer
+
+    ListLocationsResponseV1:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationV1'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+
+    # Attributes Schemas
+    Attributes:
+      type: object
+      description: Container for location attributes
+      properties:
+        name:
+          type: string
+          description: Resource name (locations/{locationId}/attributes)
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
+
+    Attribute:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Attribute ID
+        valueType:
+          type: string
+          enum: [ATTRIBUTE_VALUE_TYPE_UNSPECIFIED, BOOL, ENUM, URL, REPEATED_ENUM]
+        values:
+          type: array
+          items:
+            type: object
+        repeatedEnumValue:
+          $ref: '#/components/schemas/RepeatedEnumValue'
+        uriValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/UriAttributeValue'
+
+    RepeatedEnumValue:
+      type: object
+      properties:
+        setValues:
+          type: array
+          items:
+            type: string
+        unsetValues:
+          type: array
+          items:
+            type: string
+
+    UriAttributeValue:
+      type: object
+      properties:
+        uri:
+          type: string
+          format: uri
+
+    ListAttributeMetadataResponse:
+      type: object
+      properties:
+        attributeMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeMetadata'
+        nextPageToken:
+          type: string
+
+    AttributeMetadata:
+      type: object
+      properties:
+        parent:
+          type: string
+        attributeId:
+          type: string
+        displayName:
+          type: string
+        groupDisplayName:
+          type: string
+        valueType:
+          type: string
+          enum: [ATTRIBUTE_VALUE_TYPE_UNSPECIFIED, BOOL, ENUM, URL, REPEATED_ENUM]
+        valueMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeValueMetadata'
+        deprecated:
+          type: boolean
+
+    AttributeValueMetadata:
+      type: object
+      properties:
+        value:
+          type: object
+        displayName:
+          type: string
+
+    # Chains Schemas
+    Chain:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Resource name (chains/{chainId})
+        chainNames:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChainName'
+        websites:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChainUri'
+        locationCount:
+          type: integer
+
+    ChainName:
+      type: object
+      properties:
+        displayName:
+          type: string
+        languageCode:
+          type: string
+
+    ChainUri:
+      type: object
+      properties:
+        uri:
+          type: string
+          format: uri
+
+    SearchChainsResponse:
+      type: object
+      properties:
+        chains:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chain'
+
+    # Google Locations Schemas
+    SearchGoogleLocationsResponse:
+      type: object
+      properties:
+        googleLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoogleLocation'
+
+    GoogleLocation:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          $ref: '#/components/schemas/LocationV1'
+        requestAdminRightsUri:
+          type: string
+          format: uri
+
+    BatchGetCategoriesResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryV1'
+
+    # ===========================================
+    # Place Actions Schemas
+    # ===========================================
+    PlaceActionLink:
+      type: object
+      description: A link to trigger a place action
+      properties:
+        name:
+          type: string
+          description: Resource name (locations/{locationId}/placeActionLinks/{linkId})
+        providerType:
+          type: string
+          enum: [PROVIDER_TYPE_UNSPECIFIED, MERCHANT, AGGREGATOR_3P]
+          readOnly: true
+        isEditable:
+          type: boolean
+          readOnly: true
+        uri:
+          type: string
+          format: uri
+          description: URI to the place action
+        placeActionType:
+          type: string
+          enum: [PLACE_ACTION_TYPE_UNSPECIFIED, APPOINTMENT, ONLINE_APPOINTMENT, DINING_RESERVATION, FOOD_ORDERING, FOOD_DELIVERY, FOOD_TAKEOUT, SHOP_ONLINE]
+        isPreferred:
+          type: boolean
+          description: Whether this is the preferred link for the action type
+        createTime:
+          type: string
+          format: date-time
+          readOnly: true
+        updateTime:
+          type: string
+          format: date-time
+          readOnly: true
+
+    ListPlaceActionLinksResponse:
+      type: object
+      properties:
+        placeActionLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceActionLink'
+        nextPageToken:
+          type: string
+
+    ListPlaceActionTypeMetadataResponse:
+      type: object
+      properties:
+        placeActionTypeMetadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceActionTypeMetadata'
+        nextPageToken:
+          type: string
+
+    PlaceActionTypeMetadata:
+      type: object
+      properties:
+        placeActionType:
+          type: string
+          enum: [PLACE_ACTION_TYPE_UNSPECIFIED, APPOINTMENT, ONLINE_APPOINTMENT, DINING_RESERVATION, FOOD_ORDERING, FOOD_DELIVERY, FOOD_TAKEOUT, SHOP_ONLINE]
+        displayName:
+          type: string
+
 security:
   - OAuth2: [https://www.googleapis.com/auth/business.manage]
 
@@ -2049,7 +3535,9 @@ tags:
   - name: Accounts
     description: Business account management and administration
   - name: Locations
-    description: Business location creation, updates, and management
+    description: Business location creation, updates, and management (v4 API)
+  - name: Locations v1
+    description: Location management via Business Information API v1 (mybusinessbusinessinformation.googleapis.com)
   - name: Local Posts
     description: Local post creation and management for business promotion
   - name: Media
@@ -2064,3 +3552,13 @@ tags:
     description: Business category information and management
   - name: Verification
     description: Business location verification process
+  - name: Food Menus
+    description: Food menu management for restaurant locations (v4 API)
+  - name: Attributes
+    description: Location attributes management via Business Information API v1
+  - name: Chains
+    description: Business chain information via Business Information API v1
+  - name: Google Locations
+    description: Search for Google locations via Business Information API v1
+  - name: Place Actions
+    description: Place action links for appointments, reservations, ordering (mybusinessplaceactions.googleapis.com)
