@@ -120,22 +120,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Media'
-    delete:
-      summary: Delete media
-      description: Deletes a media object
-      tags: [Media]
-      parameters:
-        - $ref: '#/components/parameters/media_id'
-      responses:
-        '200':
-          description: Media deleted
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
+    # NOTE: The Instagram Graph API does NOT support DELETE on IG Media objects.
+    # Media can only be deleted manually from the Instagram app.
 
   # Publishing endpoints
   /{user-id}/media_publish:
