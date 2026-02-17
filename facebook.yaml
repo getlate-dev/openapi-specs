@@ -758,6 +758,7 @@ components:
             publish_to_groups: Publish to groups
             pages_messaging: Send and receive messages as a Page
             pages_manage_engagement: Manage page engagement (comments, likes)
+            read_insights: Read post and page analytics (views, clicks)
 
   parameters:
     page_id:
