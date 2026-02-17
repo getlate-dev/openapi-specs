@@ -295,6 +295,126 @@ paths:
                     type: string
                     description: Video ID
 
+  # Reels Publishing endpoints
+  # Ref: https://developers.facebook.com/docs/graph-api/reference/page/video_reels/
+  /{page-id}/video_reels:
+    post:
+      summary: Initialize or publish a Reel
+      description: |
+        Two-phase endpoint for publishing Reels to a Facebook Page.
+
+        **Phase 1 - Initialize:** Set `upload_phase=START` to begin a Reel upload.
+        Returns a `video_id` and `upload_url` for uploading the video binary.
+
+        **Phase 2 - Publish:** After uploading the video binary to the rupload URL,
+        set `upload_phase=FINISH` with the `video_id` to publish the Reel.
+
+        **Requirements:**
+        - Pages only (no personal accounts or groups)
+        - Video must be 9:16 aspect ratio, 3-60 seconds, min 540x960 resolution
+        - Supported formats: mp4, mov, mkv, avi, wmv
+
+        **Permissions:** `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`
+
+        **Error codes:**
+        - 100: Invalid parameter
+        - 104: Incorrect signature
+        - 190: Invalid OAuth 2.0 Access Token
+        - 200: Permissions error
+        - 368: The action attempted has been deemed abusive or is otherwise disallowed
+        - 613: Calls to this API have exceeded the rate limit
+        - 6000: There was a problem uploading your video file
+      tags: [Reels, Publishing]
+      parameters:
+        - $ref: '#/components/parameters/page_id'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - upload_phase
+              properties:
+                upload_phase:
+                  type: string
+                  enum: [START, FINISH]
+                  description: Phase of start or finish for video upload.
+                video_id:
+                  type: string
+                  description: Video ID needed for completing video upload. Required when `upload_phase=FINISH`.
+                video_state:
+                  type: string
+                  enum: [PUBLISHED, DRAFT, SCHEDULED]
+                  description: Desired state of the video when upload is completed. Only used with `upload_phase=FINISH`.
+                description:
+                  type: string
+                  description: Short description of the video. Supports emoji. Only used with `upload_phase=FINISH`.
+                title:
+                  type: string
+                  description: Title of the video. Supports emoji. Only used with `upload_phase=FINISH`.
+                scheduled_publish_time:
+                  type: string
+                  description: Datetime/timestamp for when the video should be scheduled. Only used when `video_state=SCHEDULED`.
+                feed_targeting:
+                  type: object
+                  description: Adds targeting parameters for video in the newsfeed.
+                targeting:
+                  type: object
+                  description: Object that limits the audience for this content.
+      responses:
+        '200':
+          description: |
+            Response varies by phase:
+            - **START:** Returns `video_id` and `upload_url`
+            - **FINISH:** Returns `success`, `post_id`, and optional `message`
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  video_id:
+                    type: string
+                    description: ID to use for uploading and publishing the Reel (returned on START)
+                  upload_url:
+                    type: string
+                    format: uri
+                    description: Rupload URL for uploading the video binary (returned on START)
+                  success:
+                    type: boolean
+                    description: Whether the Reel was published successfully (returned on FINISH)
+                  message:
+                    type: string
+                    description: Status message (returned on FINISH)
+                  post_id:
+                    type: string
+                    description: The ID of the published Reel post (returned on FINISH)
+        '400':
+          description: Invalid parameter (error code 100)
+        '401':
+          description: Invalid OAuth 2.0 Access Token (error code 190) or incorrect signature (error code 104)
+        '403':
+          description: Permissions error (error code 200) or action deemed abusive (error code 368)
+        '429':
+          description: Rate limit exceeded (error code 613)
+        '500':
+          description: Problem uploading video file (error code 6000)
+
+  # Reels video upload (rupload)
+  # Note: This endpoint is on a different host (rupload.facebook.com), not graph.facebook.com
+  # POST https://rupload.facebook.com/video-upload/v24.0/{video-id}
+  #
+  # Headers:
+  #   Authorization: OAuth {page_access_token}
+  #   file_url: {video_url}           (for URL-based upload)
+  #   -- OR --
+  #   Content-Type: application/octet-stream
+  #   file_size: {size_in_bytes}      (for binary upload)
+  #   offset: 0
+  #   Body: binary video data
+  #
+  # Response: { "success": true, "h": "<hash>" }
+
   # Post endpoints
   /{post-id}:
     get:
@@ -1437,6 +1557,8 @@ tags:
     description: Post operations
   - name: Publishing
     description: Content publishing
+  - name: Reels
+    description: Facebook Reels publishing (Pages only, 9:16 vertical video, 3-60s)
   - name: Media
     description: Media management
   - name: Comments
