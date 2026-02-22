@@ -1297,6 +1297,17 @@ components:
           type: string
           description: Insight ID
 
+    InsightsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Insight'
+          description: Array of insights
+        paging:
+          $ref: '#/components/schemas/Paging'
+
     Hashtag:
       type: object
       properties:
